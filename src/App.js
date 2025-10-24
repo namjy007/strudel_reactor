@@ -104,36 +104,33 @@ useEffect(() => {
     }
 
 }, []);
-
-
+const boxHeight = '250px';
+const boxWidth = '100%';
 return (
-    <div>
-        <h2>Strudel Demo</h2>
+    <div style={{ backgroundColor: '#1e1e1e', minHeight: '100vh', padding: '20px', fontFamily: 'Segoe UI, sans-serif' }}>
+        <h2 style={{ color: '#f0f0f0', marginBottom: '25px', textShadow: '1px 1px 2px #000' }}>Strudel Demo</h2>
         <main>
 
             <div className="container-fluid">
-                <div className="row">
+                <div className="row mb-3">
+                    
                     <div className="col-md-8" style={{ maxHeight: '50vh', overflowY: 'auto' }}>
-                        <label htmlFor="exampleFormControlTextarea1" className="form-label">Text to preprocess:</label>
-                        <textarea className="form-control" rows="15" id="proc" ></textarea>
+                        <label htmlFor="exampleFormControlTextarea1" className="form-label" style={{ fontWeight: 'bold', color: '#fff' }}>Text to preprocess:</label>
+                        <textarea className="form-control" rows="15" id="proc" style={{ backgroundColor: '#949491', color: 'white', borderRadius: '15px', padding: '10px', resize: 'none' }} ></textarea>
                     </div>
-                    <div className="col-md-4">
-
-                        <nav>
-                            <button id="process" className="btn btn-outline-primary">Preprocess</button>
-                            <button id="process_play" className="btn btn-outline-primary">Proc & Play</button>
-                            <br />
-                            <button id="play" className="btn btn-outline-primary">Play</button>
-                            <button id="stop" className="btn btn-outline-primary">Stop</button>
-                        </nav>
+                    <div className="col-md-4" style={{ backgroundColor: '#666662', borderRadius: '15px', padding: '15px', display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
+                        <button id="process" className="btn btn-outline-light">Preprocess</button>
+                        <button id="process_play" className="btn btn-outline-light">Proc & Play</button>
+                        <button id="play" className="btn btn-outline-light">Play</button>
+                        <button id="stop" className="btn btn-outline-light">Stop</button>
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-md-8" style={{ maxHeight: '50vh', overflowY: 'auto' }}>
-                        <div id="editor" />
+                    <div className="col-md-8" style={{ maxHeight: '50vh',backgroundColor: '#5c5c5a', borderRadius: '15px', padding: '10px', overflowY: 'auto' }}>
+                        <div id="editor" style={{ minHeight: '250px' }} />
                         <div id="output" />
                     </div>
-                    <div className="col-md-4">
+                    <div className="col-md-4" style={{ backgroundColor: '#666662', borderRadius: '15px', padding: '15px', display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
                         <div className="form-check">
                             <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={ProcAndPlay} defaultChecked />
                             <label className="form-check-label" htmlFor="flexRadioDefault1">
