@@ -1,5 +1,5 @@
 import './App.css';
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StrudelMirror } from '@strudel/codemirror';
 import { evalScope } from '@strudel/core';
 import { drawPianoroll } from '@strudel/draw';
@@ -63,6 +63,8 @@ export function ProcessText(match, ...args) {
 
 export default function StrudelDemo() {
 
+const [darkMode, setDarkMode] = useState(false);
+   
 const hasRun = useRef(false);
 
 useEffect(() => {
@@ -107,8 +109,14 @@ useEffect(() => {
 const boxHeight = '250px';
 const boxWidth = '100%';
 return (
-    <div style={{ backgroundColor: '#1e1e1e', minHeight: '100vh', padding: '20px', fontFamily: 'Segoe UI, sans-serif' }}>
-        <h2 style={{ color: '#f0f0f0', marginBottom: '25px', textShadow: '1px 1px 2px #000' }}>Strudel Demo</h2>
+    <div className={darkMode ? 'night' : 'day'} style={{ minHeight: '100vh', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+            <button onClick={() => setDarkMode(!darkMode)} className="dark-mode-toggle">
+                {darkMode ? 'Day' : 'Night'}
+            </button>
+        </div>
+
+        <h2 style={{ marginBottom: '20px', color: darkMode ? '#fff' : '#333' }}>Strudel Demo</h2>
         <main>
 
             <div className="container-fluid">
@@ -126,7 +134,7 @@ return (
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-md-8" style={{ maxHeight: '50vh',backgroundColor: '#5c5c5a', borderRadius: '15px', padding: '10px', overflowY: 'auto' }}>
+                    <div className="col-md-4" style={{ backgroundColor: '#666662', borderRadius: '15px', padding: '15px', display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>'auto' }}>
                         <div id="editor" style={{ minHeight: '250px' }} />
                         <div id="output" />
                     </div>
