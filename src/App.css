@@ -1,43 +1,71 @@
 body {
     margin: 0;
     font-family: 'Arial', sans-serif;
+    overflow: hidden;
 }
 
 .day {
     background-color: #f0f0f0;
-    color: #333;
+    color: white;
 }
 
 .night {
     background-color: #2a2a2a;
     color: #fff;
 }
-
-/* Boxes */
-.text-box, .strudel-box, .button-box, .radio-box {
-    border-radius: 15px;
-    padding: 10px;
-    height: 250px;
-    overflow: auto;
-    background-color: inherit;
-    color: inherit;
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background-color: #555;
 }
 
-/* Buttons */
-button {
+.split-screen {
+    display: flex;
+    height: calc(100vh - 70px);
+}
+
+.left-side,
+.right-side {
+    width: 50%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+}
+.curved-box {
+    flex: 1;
+    background-color: #666662;
+    border-radius: 15px;
+    padding: 15px;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+}
+.scrollable-box {
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 10px;
+    border: none;
+    padding: 10px;
+    resize: none;
+}
+.gray-box {
+    background-color: #777;
+    color: white;
+    overflow-y: auto;
+}
+
+
+
+.dark-mode-toggle {
     padding: 10px 15px;
     border-radius: 10px;
-    font-size: 1rem;
     cursor: pointer;
-    border: none;
-    transition: all 0.3s ease;
+    border: 1px solid currentColor;
+    background: none;
+    color: inherit;
 }
-
-    button:hover {
-        opacity: 0.85;
-    }
-
-    button.dark-mode-toggle {
-        background: none;
-        border: 1px solid currentColor;
-    }
+   

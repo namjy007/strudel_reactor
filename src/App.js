@@ -8,13 +8,13 @@ import { transpiler } from '@strudel/transpiler';
 import { getAudioContext, webaudioOutput, registerSynthSounds } from '@strudel/webaudio';
 import { registerSoundfonts } from '@strudel/soundfonts';
 import { stranger_tune } from './tunes';
-import console_monkey_patch, { getD3Data } from './console-monkey-patch';
+//import console_monkey_patch, { getD3Data } from './console-monkey-patch';
 
 let globalEditor = null;
 
-const handleD3Data = (event) => {
-    console.log(event.detail);
-};
+//const handleD3Data = (event) => {
+  //  console.log(event.detail);
+//};
 
 export function SetupButtons() {
 
@@ -70,8 +70,8 @@ const hasRun = useRef(false);
 useEffect(() => {
 
     if (!hasRun.current) {
-        document.addEventListener("d3Data", handleD3Data);
-        console_monkey_patch();
+       // document.addEventListener("d3Data", handleD3Data);
+        //console_monkey_patch();
         hasRun.current = true;
         //Code copied from example: https://codeberg.org/uzu/strudel/src/branch/main/examples/codemirror-repl
             //init canvas
@@ -106,58 +106,67 @@ useEffect(() => {
     }
 
 }, []);
-const boxHeight = '250px';
-const boxWidth = '100%';
+
 return (
-    <div className={darkMode ? 'night' : 'day'} style={{ minHeight: '100vh', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+    <div className={darkMode ? 'night' : 'day'}>
+    
+        <div className="header-bar">
+            <h2>Strudel Demo</h2>
             <button onClick={() => setDarkMode(!darkMode)} className="dark-mode-toggle">
                 {darkMode ? 'Day' : 'Night'}
             </button>
         </div>
 
-        <h2 style={{ marginBottom: '20px', color: darkMode ? '#fff' : '#333' }}>Strudel Demo</h2>
-        <main>
-
-            <div className="container-fluid">
-                <div className="row mb-3">
-                    
-                    <div className="col-md-8" style={{ maxHeight: '50vh', overflowY: 'auto' }}>
-                        <label htmlFor="exampleFormControlTextarea1" className="form-label" style={{ fontWeight: 'bold', color: '#fff' }}>Text to preprocess:</label>
-                        <textarea className="form-control" rows="15" id="proc" style={{ backgroundColor: '#949491', color: 'white', borderRadius: '15px', padding: '10px', resize: 'none' }} ></textarea>
+            <div className="split-screen">
+                {/* LImagining it as a split screen for the Ui to look better*/}
+                <div className="left-side">
+                    {/* The text box will be here where we are inputting the code that turens into music  */}
+                    <div className="curved-box">
+                        <label htmlFor="proc" className="box-label">Text to preprocess:</label>
+                        <textarea
+                            id="proc"
+                            className="scrollable-box"
+                            style={{ backgroundColor: darkMode ? '#4a4a4a' : '#777', color: 'white' }}
+                        ></textarea>
                     </div>
-                    <div className="col-md-4" style={{ backgroundColor: '#666662', borderRadius: '15px', padding: '15px', display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
+
+                    {/* The editor strudel display  */}
+                    <div
+                        id="editor"
+                        style={{
+                            height: '350px',      // editor height
+                            width: '100%',
+                            borderRadius: '15px',
+                            backgroundColor: darkMode ? '#1e1e1e' : '#fdfdfd',
+                            overflow: 'auto',
+                        }}
+                    ></div>
+
+                    <canvas id="roll" style={{ display: 'none' }}></canvas>
+                </div>
+
+                {/* The right side of the screen where the actual buttons and futur work will be */}
+                <div className="right-side">
+                    <div className="curved-box gray-box">
+                        <h4>Control Panel</h4>
                         <button id="process" className="btn btn-outline-light">Preprocess</button>
                         <button id="process_play" className="btn btn-outline-light">Proc & Play</button>
                         <button id="play" className="btn btn-outline-light">Play</button>
                         <button id="stop" className="btn btn-outline-light">Stop</button>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-md-4" style={{ backgroundColor: '#666662', borderRadius: '15px', padding: '15px', display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>'auto' }}>
-                        <div id="editor" style={{ minHeight: '250px' }} />
-                        <div id="output" />
-                    </div>
-                    <div className="col-md-4" style={{ backgroundColor: '#666662', borderRadius: '15px', padding: '15px', display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
-                        <div className="form-check">
-                            <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={ProcAndPlay} defaultChecked />
-                            <label className="form-check-label" htmlFor="flexRadioDefault1">
-                                p1: ON
-                            </label>
-                        </div>
-                        <div className="form-check">
-                            <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onChange={ProcAndPlay} />
-                            <label className="form-check-label" htmlFor="flexRadioDefault2">
-                                p1: HUSH
-                            </label>
+
+                        <div style={{ marginTop: '15px' }}>
+                            <div className="form-check">
+                                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={ProcAndPlay} defaultChecked />
+                                <label className="form-check-label">p1: ON</label>
+                            </div>
+                            <div className="form-check">
+                                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onChange={ProcAndPlay} />
+                                <label className="form-check-label">p1: HUSH</label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <canvas id="roll"></canvas>
-        </main >
-    </div >
-);
-
-
+        </div>
+    );
 }
