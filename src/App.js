@@ -28,11 +28,7 @@ export function Proc() {
 }
 
 export function ProcessText(match, ...args) {
-    let replace = "";
-    if (document.getElementById('flexRadioDefault2')?.checked) {
-        replace = "_";
-    }
-    return replace;
+    return ""; // taking it off for now will implement it later, i will do some new design
 }
 
 export default function StrudelDemo() {
@@ -73,7 +69,7 @@ export default function StrudelDemo() {
 
     return (
         <div className={darkMode ? 'night' : 'day'} style={{ minHeight: '100vh', padding: '20px' }}>
-            <div className="header-bar">
+            <div className="header-bar" style={{ textAlign: 'center', marginBottom: '40px' }}>
                 <h2>Strudel Demo</h2>
                 <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
             </div>
@@ -109,16 +105,16 @@ export default function StrudelDemo() {
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '25px',
-                            height: '100%',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            gap: '20px',
+                            padding: '20px',
+                            borderRadius: '15px'
                         }}
                     >
                         <h4 style={{ textAlign: 'center' }}>Control Panel</h4>
 
                         <div style={{ display: 'flex', gap: '30px', alignItems: 'center', justifyContent: 'center' }}>
-                            {/* Only render button if editor is ready */}
+                            {/* Only renders button if editor is ready */}
                             {editorReady && <PlayPauseButton getEditor={() => globalEditor} />}
 
                             <div style={{ cursor: 'pointer', color: 'white' }} title="Delete">
@@ -135,16 +131,8 @@ export default function StrudelDemo() {
                         </div>
 
                         {/* p1 Radio buttons */}
-                        <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
-                            <div className="form-check">
-                                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" onChange={ProcAndPlay} defaultChecked />
-                                <label className="form-check-label">p1: ON</label>
-                            </div>
-                            <div className="form-check">
-                                <input className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" onChange={ProcAndPlay} />
-                                <label className="form-check-label">p1: HUSH</label>
-                            </div>
-                        </div>
+                        
+                        
                     </div>
                 </div>
             </div>
