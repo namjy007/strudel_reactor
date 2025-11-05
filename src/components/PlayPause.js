@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+//I amde some changes to this too since last commit, my button was broken it wouldnt change on if the sound was playing hence now it works more smartly 
 export default function PlayPauseButton({ getEditor }) {
     const [isPlaying, setIsPlaying] = useState(false);
 
@@ -20,7 +20,7 @@ export default function PlayPauseButton({ getEditor }) {
         if (!editor) return;
 
         if (isPlaying) {
-            editor.stop();
+            editor.stop(); /*This changes their icon on detecting if music is playing or not */
             setIsPlaying(false);
         } else {
             editor.evaluate();

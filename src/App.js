@@ -14,9 +14,7 @@ import SoundEditor from './components/SoundEditor';
 
 let globalEditor = null;
 
-// ----------------------
-// Preprocess & Play
-// ----------------------
+
 export function ProcAndPlay() {
     if (globalEditor && globalEditor.repl.state.started) {
         Proc();
@@ -24,17 +22,15 @@ export function ProcAndPlay() {
     }
 }
 
-// ----------------------
-// Process text and inject volumes/echoes
-// ----------------------
+
 export function Proc() {
     const proc_text = document.getElementById('proc').value;
 
-    // Default instrument volumes & echoes
+    /* Here the volumes are set before hand, i did work on echoes too but havent completely implemented it so far.  */
     if (!window.instrumentVolumes) window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
     if (!window.instrumentEchoes) window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
 
-    let proc_text_replaced = proc_text
+    let proc_text_replaced = proc_text // This replaces all the current volume of the instruments and fills in with the slider data 
         .replaceAll('<basslineVolume>', window.instrumentVolumes.Bassline)
         .replaceAll('<mainArpVolume>', window.instrumentVolumes["Main Arp"])
         .replaceAll('<drumsVolume>', window.instrumentVolumes.Drums)
@@ -47,13 +43,11 @@ export function Proc() {
 }
 window.Proc = Proc;
 
-// ----------------------
-// Main Component
-// ----------------------
+
 export default function StrudelDemo() {
     const [darkMode, setDarkMode] = useState(false);
     const [editorReady, setEditorReady] = useState(false);
-    const [showSoundEditor, setShowSoundEditor] = useState(false);
+    const [showSoundEditor, setShowSoundEditor] = useState(false); // This were from previous commits 
 
     useEffect(() => {
         const canvas = document.getElementById('roll');
@@ -85,7 +79,7 @@ export default function StrudelDemo() {
         if (globalEditor?.root) globalEditor.root.style.fontSize = '16px';
         document.getElementById('proc').value = stranger_tune;
 
-        // Load saved settings from localStorage
+        
         const savedSettings = localStorage.getItem('soundSettings');
         if (savedSettings) {
             const parsed = JSON.parse(savedSettings);
@@ -93,7 +87,7 @@ export default function StrudelDemo() {
                 Bassline: parsed.Bassline?.volume ?? 1,
                 "Main Arp": parsed["Main Arp"]?.volume ?? 1,
                 Drums: parsed.Drums?.volume ?? 1,
-                Drums2: parsed.Drums2?.volume ?? 1,
+                Drums2: parsed.Drums2?.volume ?? 1, // This reads the saved settings or values of volume so that the sound editor doesnt reset itself every time 
             };
             window.instrumentEchoes = {
                 Bassline: parsed.Bassline?.echo ? 1 : 0,
@@ -102,11 +96,11 @@ export default function StrudelDemo() {
                 Drums2: parsed.Drums2?.echo ? 1 : 0,
             };
         } else {
-            window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
-            window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
+            window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 }; /* this checks if the volume were altered before if not it will alter  */
+            window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 }; 
         }
 
-        Proc(); // Evaluate initial tune
+        Proc(); 
         setEditorReady(true);
     }, []);
 
