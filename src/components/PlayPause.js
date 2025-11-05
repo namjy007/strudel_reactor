@@ -6,11 +6,12 @@ export default function PlayPauseButton({ getEditor }) {
     useEffect(() => {
         const interval = setInterval(() => {
             const editor = getEditor?.();
-            if (editor?.repl?.state?.started === false && isPlaying) {
-                setIsPlaying(false);
+            if (!editor) return;
+            const playing = editor.repl?.state?.started === true;
+            if (playing !== isPlaying) {
+                setIsPlaying(playing);
             }
-        }, 200);
-
+        }, 100);
         return () => clearInterval(interval);
     }, [getEditor, isPlaying]);
 

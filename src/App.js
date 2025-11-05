@@ -1,18 +1,22 @@
-﻿import './App.css';
+﻿// src/App.js
+import './App.css';
 import { useEffect, useState } from "react";
 import { StrudelMirror } from '@strudel/codemirror';
 import { evalScope } from '@strudel/core';
 import { drawPianoroll } from '@strudel/draw';
-import { initAudioOnFirstClick } from '@strudel/webaudio';
+import { initAudioOnFirstClick, getAudioContext, webaudioOutput, registerSynthSounds } from '@strudel/webaudio';
 import { transpiler } from '@strudel/transpiler';
-import { getAudioContext, webaudioOutput, registerSynthSounds } from '@strudel/webaudio';
 import { registerSoundfonts } from '@strudel/soundfonts';
 import { stranger_tune } from './tunes';
 import PlayPauseButton from './components/PlayPause';
 import DarkModeToggle from './components/DayNight';
 import SoundEditor from './components/SoundEditor';
+
 let globalEditor = null;
 
+// ----------------------
+// Preprocess & Play
+// ----------------------
 export function ProcAndPlay() {
     if (globalEditor && globalEditor.repl.state.started) {
         Proc();
@@ -20,25 +24,41 @@ export function ProcAndPlay() {
     }
 }
 
+// ----------------------
+// Process text and inject volumes/echoes
+// ----------------------
 export function Proc() {
     const proc_text = document.getElementById('proc').value;
-    const proc_text_replaced = proc_text.replaceAll('<p1_Radio>', ProcessText);
-    ProcessText(proc_text);
-    if (globalEditor) globalEditor.setCode(proc_text_replaced);
-}
 
-export function ProcessText(match, ...args) {
-    return ""; // taking it off for now will implement it later, i will do some new design
-}
+    // Default instrument volumes & echoes
+    if (!window.instrumentVolumes) window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
+    if (!window.instrumentEchoes) window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
 
+    let proc_text_replaced = proc_text
+        .replaceAll('<basslineVolume>', window.instrumentVolumes.Bassline)
+        .replaceAll('<mainArpVolume>', window.instrumentVolumes["Main Arp"])
+        .replaceAll('<drumsVolume>', window.instrumentVolumes.Drums)
+        .replaceAll('<drums2Volume>', window.instrumentVolumes.Drums2);
+
+    if (globalEditor) {
+        globalEditor.setCode(proc_text_replaced);
+        globalEditor.evaluate();
+    }
+}
+window.Proc = Proc;
+
+// ----------------------
+// Main Component
+// ----------------------
 export default function StrudelDemo() {
     const [darkMode, setDarkMode] = useState(false);
     const [editorReady, setEditorReady] = useState(false);
     const [showSoundEditor, setShowSoundEditor] = useState(false);
+
     useEffect(() => {
         const canvas = document.getElementById('roll');
-        canvas.width = canvas.width * 2;
-        canvas.height = canvas.height * 2;
+        canvas.width *= 2;
+        canvas.height *= 2;
         const drawContext = canvas.getContext('2d');
         const drawTime = [-2, 2];
 
@@ -61,33 +81,46 @@ export default function StrudelDemo() {
                 await Promise.all([loadModules, registerSynthSounds(), registerSoundfonts()]);
             },
         });
-        if (globalEditor && globalEditor.root) {
-            globalEditor.root.style.fontSize = '16px';
-        }
+
+        if (globalEditor?.root) globalEditor.root.style.fontSize = '16px';
         document.getElementById('proc').value = stranger_tune;
-        Proc();
-        setEditorReady(true); // editor is now ready for PlayPauseButton
+
+        // Load saved settings from localStorage
+        const savedSettings = localStorage.getItem('soundSettings');
+        if (savedSettings) {
+            const parsed = JSON.parse(savedSettings);
+            window.instrumentVolumes = {
+                Bassline: parsed.Bassline?.volume ?? 1,
+                "Main Arp": parsed["Main Arp"]?.volume ?? 1,
+                Drums: parsed.Drums?.volume ?? 1,
+                Drums2: parsed.Drums2?.volume ?? 1,
+            };
+            window.instrumentEchoes = {
+                Bassline: parsed.Bassline?.echo ? 1 : 0,
+                "Main Arp": parsed["Main Arp"]?.echo ? 1 : 0,
+                Drums: parsed.Drums?.echo ? 1 : 0,
+                Drums2: parsed.Drums2?.echo ? 1 : 0,
+            };
+        } else {
+            window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
+            window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
+        }
+
+        Proc(); // Evaluate initial tune
+        setEditorReady(true);
     }, []);
-    const handleEditClick = () => {
-        setShowSoundEditor(true);
-    };
 
-    const handleSaveSound = (editedSound) => {
-        console.log("Sound updated:", editedSound);
-        setShowSoundEditor(false);
-    };
+    const handleEditClick = () => setShowSoundEditor(true);
+    const handleCancelSound = () => setShowSoundEditor(false);
 
-    const handleCancelSound = () => {
-        setShowSoundEditor(false);
-    };
     return (
         <div className={darkMode ? 'night' : 'day'} style={{ minHeight: '100vh', padding: '20px' }}>
             <div className="header-bar" style={{ textAlign: 'center', marginBottom: '40px' }}>
                 <h2>Strudel Demo</h2>
                 <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
             </div>
-            {/*I was going through the pdf and just saw that Mark was using cells, but i did not like the design of cells because the left two cells took over a wider area hence i thought of changin it over and also have 3 cells instead of 4 */ }
-            <div className="split-screen"> 
+
+            <div className="split-screen">
                 <div className="left-side">
                     <div className="curved-box">
                         <label htmlFor="proc" className="box-label">Text to preprocess:</label>
@@ -114,9 +147,8 @@ export default function StrudelDemo() {
                 </div>
 
                 <div className="right-side">
-                    { /*Shwoing the Sound Editor instead of The control panhel it checks if its true or false and renders accordingly */ }
-                    {showSoundEditor ? ( 
-                        <SoundEditor onClose={handleCancelSound} />
+                    {showSoundEditor ? (
+                        <SoundEditor onClose={handleCancelSound} procFunc={Proc} />
                     ) : (
                         <div
                             className="curved-box gray-box"
@@ -131,22 +163,28 @@ export default function StrudelDemo() {
                             }}
                         >
                             <h4 style={{ textAlign: 'center' }}>Control Panel</h4>
+                            <div className="d-flex gap-3 justify-content-center align-items-center">
+                                {editorReady && (
+                                    <div className="btn btn-outline-primary d-flex justify-content-center align-items-center"
+                                        style={{ width: "60px", height: "60px", borderRadius: "12px" }}>
+                                        <PlayPauseButton getEditor={() => globalEditor} />
+                                    </div>
+                                )}
 
-                            <div style={{ display: 'flex', gap: '30px', alignItems: 'center', justifyContent: 'center' }}>
-                                {editorReady && <PlayPauseButton getEditor={() => globalEditor} />}
-
-                                <div style={{ cursor: 'pointer', color: 'white' }} title="Delete">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-dash-circle-fill" viewBox="0 0 16 16">
+                                <div className="btn d-flex justify-content-center align-items-center"
+                                    style={{ width: "60px", height: "60px", borderRadius: "12px", backgroundColor: "red" }}
+                                    title="Restore">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white"
+                                        className="bi bi-dash-circle-fill" viewBox="0 0 16 16">
                                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z" />
                                     </svg>
                                 </div>
 
-                                <div
-                                    onClick={handleEditClick}
-                                    style={{ cursor: 'pointer', color: 'white' }}
-                                    title="Edit"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" className="bi bi-pencil" viewBox="0 0 16 16">
+                                <div onClick={handleEditClick} className="btn d-flex justify-content-center align-items-center"
+                                    style={{ width: "60px", height: "60px", borderRadius: "12px", backgroundColor: "brown" }}
+                                    title="Edit">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white"
+                                        className="bi bi-pencil" viewBox="0 0 16 16">
                                         <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
                                     </svg>
                                 </div>
