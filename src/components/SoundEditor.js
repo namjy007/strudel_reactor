@@ -1,5 +1,9 @@
-﻿// src/components/StudioEditor.js 
+﻿// src/components/StudioEditor.js
 //The reason i decided to make a component for this is because it was getting really messy in the App.js so its better to have components. easy to access, work on and understand.
+
+
+/* My feature for JSON handling starts from line 33 and ends at line 75 */
+
 import React from 'react';
 import { useState, useEffect } from 'react';
 export default function SoundEditor({ onClose, procFunc }) {
@@ -16,26 +20,35 @@ export default function SoundEditor({ onClose, procFunc }) {
     const [settings, setSettings] = useState(defaultSettings);
 
 
-    const [expanded, setExpanded] = useState({
+    const [expanded, setExpanded] = useState({ /* The volume accordion is set as true to open first everytime the user opens the panel. */
         volume: true,
         echo: false,
         reverse: false,
         room: false,
         speed: false
     });
-    useEffect(() => {
-        const saved = localStorage.getItem('soundSettings');
+
+/* This is my JSON feature implemented as stated in the PDF. 
+JSON HANDLING: This is reponsible for the saving and the 
+loading of all the sound settings, each instrument from the 
+strudel code (tunes.js) The data is stored in the browsers 
+local storage ( i thought was a better way to implement this) 
+in the JSON format, This enables user to not lose their 
+settings even when they refresh the page.  */
+
+    useEffect(() => { 
+        const saved = localStorage.getItem('soundSettings'); // This will get the previous settings 
         if (saved) {
             const parsed = JSON.parse(saved);
             setSettings(parsed);
-
+            /* Here i am creating a Volume global object so other app can access too*/
             window.instrumentVolumes = {
                 Bassline: parsed.Bassline?.volume ?? 1,
                 "Main Arp": parsed["Main Arp"]?.volume ?? 1,
                 Drums: parsed.Drums?.volume ?? 1,
                 Drums2: parsed.Drums2?.volume ?? 1,
             };
-        } else {
+        } else { // This sets a default value if no settings is avalaible 
             window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
         }
     }, []);
@@ -59,7 +72,7 @@ export default function SoundEditor({ onClose, procFunc }) {
             // This will right after save to the local settings which will be handy 
             localStorage.setItem('soundSettings', JSON.stringify(newSettings));
 
-            
+            // For now since the only working feature is Volume.
             if (key === "volume") {
                 if (!window.instrumentVolumes) window.instrumentVolumes = {};
                 window.instrumentVolumes[currentName] = value;

@@ -1,5 +1,9 @@
 ﻿export const stranger_tune = `setcps(140/60/4)
 
+
+// This tunes.js is edited too, This file manages to accept values from the slider or buttons and then load them perfectly into strudel.
+
+
 samples('github:algorave-dave/samples')
 samples('https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/master/strudel.json')
 samples('https://raw.githubusercontent.com/Mittans/tidal-drum-machines/main/machines/tidal-drum-machines.json')

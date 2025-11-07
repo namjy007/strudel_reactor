@@ -1,5 +1,5 @@
 import React from 'react';
-
+// This is the button that toggles day and night on and off.
 export default function DarkModeToggle({ darkMode, setDarkMode }) {
 
     const handleClick = () => {

@@ -2,6 +2,29 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# About the App 
+This app is a part of the assignment Part A for now. The application basically lets you convert code into music but also edit the instruments in real time. 
+
+# How to use: 
+1. The play and pause button lets you play the music from the strudel directly 
+2. The Restore button is supposed to lose all the settings currently imposed ( Doesnt work in this version) 
+3. The Edit button is the main component here: it can let you increase the volume or decrease, Adds echo, and many other stuff to the instruments. ( The cancel button doesnt work in this version since it is only working as going back button will work perfectly in final draft) 
+4. The Save button writes on to json and saves the settings and doesnt reset everytime you open the edit panel.
+5. We have a Day and NIght button which lets you toggle and turn it dark and white in the background. 
+
+# Referemces:
+I have refered some of the websites in my previous commit when i implemented them initially.
+1. Paggination on Sound Editor panel 'Bootstrap. (n.d.). Pagination · Bootstrap (v4.0 documentation). https://getbootstrap.com/docs/4.0/components/pagination/' ( just a reference but imposed uising css styling )
+2. Accordion added in SoundEditor panel 'Bootstrap. (n.d.). Accordion · Bootstrap (v5.3 documentation). Retrieved August 7, 2025, from https://getbootstrap.com/docs/5.3/components/accordion' 
+
+# Feature: (Only one for Part A)
+1. I have JSON handling implemented in my SoundEditor.js from line 33 to 75. 
+
+# Additional Comments:
+1. Remark for part a will be appreciated since it will help me work better on Part b. 
+2. I have tried and covered every aspect as to get the 15%, Commenting, Good demonstration and Presenting my work to the presentor.
+3. I have added git commit with different comments at different stage through out the project. 
+
 ## Available Scripts
 
 In the project directory, you can run:
