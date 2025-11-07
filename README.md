@@ -12,6 +12,37 @@ This app is a part of the assignment Part A for now. The application basically l
 4. The Save button writes on to json and saves the settings and doesnt reset everytime you open the edit panel.
 5. We have a Day and NIght button which lets you toggle and turn it dark and white in the background. 
 
+# UI and Controls
+The application is Strudel which lets you play music and edit instruments the  way you like.
+
+Theme: The app is a gray/black themed app which suits some poples liking to dark visuals. 
+I have also a night toggle which turns the bakcgroung behind the components a darker gray.
+
+Left Side:
+This side is my Preprocessing text box area and the Strudel Mirror.
+
+Right side:
+Here are my main panels. The Control panel and the Sound Editor Panel.
+
+Control Panel: 
+1. PlayPauseButton: Toggles music playback.
+2. Restore Button (red, currently not functional): Intended to reset settings.
+3. Edit Button (brown): Opens the Sound Editor component.
+
+Sound Editor: 
+1. Allows per-instrument editing of volume, echo, reverse, room, and speed.
+2. Each instrument has a navigation bar with "Previous", "Next", and direct buttons to switch instruments.
+3. Uses accordion-style controls to expand/collapse each setting for a clean layout.
+4. Sliders for numeric values (volume, room, speed) and checkboxes for boolean effects (echo, reverse).
+5. Settings are saved in localStorage in JSON format to persist across sessions.
+
+# Bootsrap
+1. Buttons
+2. Icons
+3. Accordion 
+4. Pagination
+5. Will implement soon
+
 # Referemces:
 I have refered some of the websites in my previous commit when i implemented them initially.
 1. Paggination on Sound Editor panel 'Bootstrap. (n.d.). Pagination · Bootstrap (v4.0 documentation). https://getbootstrap.com/docs/4.0/components/pagination/' ( just a reference but imposed uising css styling )
@@ -21,9 +52,11 @@ I have refered some of the websites in my previous commit when i implemented the
 1. I have JSON handling implemented in my SoundEditor.js from line 33 to 75. 
 
 # Additional Comments:
-1. Remark for part a will be appreciated since it will help me work better on Part b. 
+1. Remark for part A will be appreciated since it will help me work better on Part b. 
 2. I have tried and covered every aspect as to get the 15%, Commenting, Good demonstration and Presenting my work to the presentor.
 3. I have added git commit with different comments at different stage through out the project. 
+
+
 
 ## Available Scripts
 
