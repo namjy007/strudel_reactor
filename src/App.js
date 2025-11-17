@@ -11,7 +11,8 @@ import { stranger_tune } from './tunes';
 import PlayPauseButton from './components/PlayPause';
 import DarkModeToggle from './components/DayNight';
 import SoundEditor from './components/SoundEditor';
-
+import ExportButton from './components/ExportButton';
+import ImportButton from './components/ImportButton';
 let globalEditor = null;
 
 
@@ -61,7 +62,7 @@ export default function StrudelDemo() {
             getTime: () => getAudioContext().currentTime,
             transpiler,
             root: document.getElementById('editor'),
-            drawTime,
+            drawTime: [-2, 2],
             onDraw: (haps, time) => drawPianoroll({ haps, time, ctx: drawContext, drawTime, fold: 0 }),
             prebake: async () => {
                 initAudioOnFirstClick();
@@ -76,7 +77,10 @@ export default function StrudelDemo() {
             },
         });
 
-        if (globalEditor?.root) globalEditor.root.style.fontSize = '16px';
+        if (globalEditor?.root) {
+            globalEditor.root.style.fontSize = '16px';
+            globalEditor.root.style.overflowY = 'auto'; // scrollable Strudel editor
+        }
         document.getElementById('proc').value = stranger_tune;
 
         
@@ -108,8 +112,8 @@ export default function StrudelDemo() {
     const handleCancelSound = () => setShowSoundEditor(false);
 
     return ( /* This UI, i have imposed gray, black and white tone. */
-        <div className={darkMode ? 'night' : 'day'} style={{ minHeight: '100vh', padding: '20px' }}>
-            <div className="header-bar" style={{ textAlign: 'center', marginBottom: '40px' }}>
+        <div className={darkMode ? 'night' : 'day'} >
+            <div className="header-bar" >
                 <h2>Strudel Demo</h2>
                 <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
             </div>
@@ -117,76 +121,48 @@ export default function StrudelDemo() {
             <div className="split-screen">
                 <div className="left-side">
                     <div className="curved-box">
-                        <label htmlFor="proc" className="box-label">Text to preprocess:</label>
-                        <textarea
-                            id="proc"
-                            className="scrollable-box"
-                            style={{ backgroundColor: darkMode ? '#4a4a4a' : '#777', color: 'white' }}
-                        ></textarea>
+                        <label htmlFor="proc">Text to preprocess:</label>
+                        <textarea id="proc" className="scrollable-box"></textarea>
                     </div>
 
-                    <div
-                        id="editor"
-                        style={{
-                            height: '350px',
-                            width: '100%',
-                            borderRadius: '15px',
-                            backgroundColor: darkMode ? '#1e1e1e' : '#fdfdfd',
-                            overflow: 'auto',
-                            fontSize: '16px'
-                        }}
-                    ></div>
+                    <div id="editor" className="curved-box"></div>
 
-                    <canvas id="roll" style={{ display: 'none' }}></canvas>
+                    <canvas id="roll" style={{ height: '150px', borderRadius: '10px', backgroundColor: '#222' }}></canvas>
                 </div>
 
                 <div className="right-side">
-                    {showSoundEditor ? ( /* This checks if its Sound Editor is true if not it loads the control panel */
+                    {showSoundEditor ? (
                         <SoundEditor onClose={handleCancelSound} procFunc={Proc} />
                     ) : (
-                        <div
-                            className="curved-box gray-box"
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: '20px',
-                                padding: '20px',
-                                borderRadius: '15px',
-                                backgroundColor: '#555'
-                            }}
-                        >
+                        <div className="gray-box">
                             <h4 style={{ textAlign: 'center' }}>Control Panel</h4>
-                            <div className="d-flex gap-3 justify-content-center align-items-center">
-                                {editorReady && (
-                                    <div className="btn btn-outline-primary d-flex justify-content-center align-items-center"
-                                        style={{ width: "60px", height: "60px", borderRadius: "12px" }}>
-                                        <PlayPauseButton getEditor={() => globalEditor} />
-                                    </div>
-                                )}
 
-                                <div className="btn d-flex justify-content-center align-items-center"
-                                    style={{ width: "60px", height: "60px", borderRadius: "12px", backgroundColor: "red" }}
-                                    title="Restore">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white" /* This doesnt work for now as i havent done a onclick yet, will function in next final draft */
+                            <div className="d-flex gap-3 justify-content-center align-items-center" style={{ flexWrap: 'wrap', marginBottom: '20px' }}>
+                                {editorReady && <div className="btn btn-success"><PlayPauseButton getEditor={() => globalEditor} /></div>}
+                                <div className="btn btn-danger" title="Restore">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white"
                                         className="bi bi-dash-circle-fill" viewBox="0 0 16 16">
                                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z" />
-                                    </svg> 
+                                    </svg>
                                 </div>
-
-                                <div onClick={handleEditClick} className="btn d-flex justify-content-center align-items-center"
-                                    style={{ width: "60px", height: "60px", borderRadius: "12px", backgroundColor: "brown" }}
-                                    title="Edit"> 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white" /* This is the edit button that takes you to the Sound Editor Component. */
+                                <div className="btn btn-warning" onClick={handleEditClick} title="Edit">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white"
                                         className="bi bi-pencil" viewBox="0 0 16 16">
                                         <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
                                     </svg>
                                 </div>
                             </div>
+                                /* here these buttons are imported from their respectvie components */
+                            <div className="export-container">
+                                    <ExportButton />
+                                    
+                                <ImportButton /> 
+                                </div> 
                         </div>
                     )}
                 </div>
             </div>
         </div>
+           
     );
 }
