@@ -1,6 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
-
+/*Tried but didnt work but i can still explain my work: I attempted to build a custom waveform display using D3.js. I created a React component called AudioWaveform, where I used an <svg> element and connected it to the browser’s AnalyserNode
+Inside the component, I used useRef to access the SVG element and useEffect to run the D3 drawing logic once the analyser was available.
+I set up an fftSize, created a Uint8Array buffer, and used D3 scales(xScale and yScale) to map the audio data to SVG coordinates
+I then used d3.line() to generate the waveform path and appended the path to the SVG.
+Inside renderFrame()*/
 export default function AudioWaveform({ analyser }) {
     const svgRef = useRef();
 

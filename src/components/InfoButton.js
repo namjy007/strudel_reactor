@@ -1,5 +1,5 @@
 import React from 'react';
-
+//Basic info button 
 export default function InfoButton({ onClick }) {
     return (
         <button

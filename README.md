@@ -3,14 +3,18 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 # About the App 
-This app is a part of the assignment Part A for now. The application basically lets you convert code into music but also edit the instruments in real time. 
+This app is a part of the COMPLETE assignment Part A AND Part B. The application basically lets you convert code into music but also edit the instruments in real time. 
 
 # How to use: 
 1. The play and pause button lets you play the music from the strudel directly 
 2. The Restore button is supposed to lose all the settings currently imposed ( Doesnt work in this version) 
 3. The Edit button is the main component here: it can let you increase the volume or decrease, Adds echo, and many other stuff to the instruments. ( The cancel button doesnt work in this version since it is only working as going back button will work perfectly in final draft) 
 4. The Save button writes on to json and saves the settings and doesnt reset everytime you open the edit panel.
-5. We have a Day and NIght button which lets you toggle and turn it dark and white in the background. 
+5. We have a Day and NIght button which lets you toggle and turn it dark and white in the background.
+6. We have a Table that lets you Mute and Unmute intruments easily without having to go to the Sound Editor. 
+7. The info button shows you the basic  info about the app.
+8. The app can let users add echo, room, and speed to their instruments.
+9. Users can also export and import their settings loaded into the music 
 
 # UI and Controls
 The application is Strudel which lets you play music and edit instruments the  way you like.
@@ -19,7 +23,7 @@ Theme: The app is a gray/black themed app which suits some poples liking to dark
 I have also a night toggle which turns the bakcgroung behind the components a darker gray.
 
 Left Side:
-This side is my Preprocessing text box area and the Strudel Mirror.
+This side is my Preprocessing text box area and the Strudel Mirror and the D3.
 
 Right side:
 Here are my main panels. The Control panel and the Sound Editor Panel.
@@ -28,7 +32,9 @@ Control Panel:
 1. PlayPauseButton: Toggles music playback.
 2. Restore Button (red, currently not functional): Intended to reset settings.
 3. Edit Button (brown): Opens the Sound Editor component.
-
+4. Info Button: Opens The info panel
+5. The Mute Table: Lets users mute and Unmute easily. 
+1. 
 Sound Editor: 
 1. Allows per-instrument editing of volume, echo, reverse, room, and speed.
 2. Each instrument has a navigation bar with "Previous", "Next", and direct buttons to switch instruments.
@@ -41,21 +47,25 @@ Sound Editor:
 2. Icons
 3. Accordion 
 4. Pagination
-5. Will implement soon
+5. Checkboxes
+6. Range Slider
+And many more...
 
 # Referemces:
 I have refered some of the websites in my previous commit when i implemented them initially.
 1. Paggination on Sound Editor panel 'Bootstrap. (n.d.). Pagination · Bootstrap (v4.0 documentation). https://getbootstrap.com/docs/4.0/components/pagination/' ( just a reference but imposed uising css styling )
 2. Accordion added in SoundEditor panel 'Bootstrap. (n.d.). Accordion · Bootstrap (v5.3 documentation). Retrieved August 7, 2025, from https://getbootstrap.com/docs/5.3/components/accordion' 
 
-# Feature: (Only one for Part A)
-1. I have JSON handling implemented in my SoundEditor.js from line 33 to 75. 
+# Feature: 
+1. I have JSON handling implemented in my SoundEditor.js from line 33 to 75.  
+2. Handling JSON import and export. 
 
 # Additional Comments:
-1. Remark for part A will be appreciated since it will help me work better on Part b. 
-2. I have tried and covered every aspect as to get the 15%, Commenting, Good demonstration and Presenting my work to the presentor.
-3. I have added git commit with different comments at different stage through out the project. 
-
+1. I have worked really hard on this, Covered evry single aspect i could.
+2. I couldn't work on the D3 but i have attempted. I tried getting waveforms and also bars but none worked. I felt it was better to have a blank d3 and show i have attempted than to apply Marks (Course Cooridnator)
+3. Json is done well, the layout is followed as to David's Recomendation of colors. ( I wanted to go with black shades) 
+4. I have left the Main Arp to be left playing just in case it easier to differentiate between whats playing and whats not. 
+5. Sorry if there is not much difference betwee partA and part B, i had a overload this semester hence couldnt catch up with working on the part B but i have still implemented everything according to the requirements. 
 
 
 ## Available Scripts

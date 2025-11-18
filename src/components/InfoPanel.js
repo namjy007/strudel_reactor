@@ -25,7 +25,7 @@ export default function InfoPanel({ onClose }) {
                 Beneath the editor, a dynamic D3-powered waveform visualization uses Web Audio API to visually represent the audio output, providing instant feedback on the sound.
             </p>
             <p style={{ lineHeight: 1.5, marginBottom: '12px' }}>
-                The right control panel contains essential playback controls — including play, pause, and restore buttons — along with Export and Import functionality to save and load the compositions.
+                The right control panel contains essential playback controls including play, pause, and restore buttons along with Export and Import functionality to save and load the compositions.
             </p>
             <p style={{ lineHeight: 1.5, marginBottom: '12px' }}>
                 User will also find a detailed instruments table to mute/unmute sounds and adjust volumes, plus an advanced editor for tweaking instrument parameters such as echo, room reverb, playback speed, and volume. All controls update instantly and keep the UI consistent with a clean, dark theme.
