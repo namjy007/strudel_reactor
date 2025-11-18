@@ -1,9 +1,8 @@
 ﻿// src/App.js
 import './App.css';
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { StrudelMirror } from '@strudel/codemirror';
 import { evalScope } from '@strudel/core';
-import { drawPianoroll } from '@strudel/draw';
 import { initAudioOnFirstClick, getAudioContext, webaudioOutput, registerSynthSounds } from '@strudel/webaudio';
 import { transpiler } from '@strudel/transpiler';
 import { registerSoundfonts } from '@strudel/soundfonts';
@@ -14,8 +13,9 @@ import SoundEditor from './components/SoundEditor';
 import ExportButton from './components/ExportButton';
 import ImportButton from './components/ImportButton';
 import InstrumentVolumeTable from './components/InstrumentVolumeTable';
-let globalEditor = null;
+import AudioWaveform from './components/AudioWaveform'; // New D3 waveform visualizer component
 
+let globalEditor = null;
 
 export function ProcAndPlay() {
     if (globalEditor && globalEditor.repl.state.started) {
@@ -24,19 +24,16 @@ export function ProcAndPlay() {
     }
 }
 
-
 export function Proc() {
     const proc_text = document.getElementById('proc').value;
 
-    /* Here the volumes are set before hand, i did work on echoes too but havent completely implemented it so far.  */
     if (!window.instrumentVolumes) window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
-    if (!window.instrumentEchoes)
-        window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
+    if (!window.instrumentEchoes) window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
     if (!window.instrumentSpeeds) window.instrumentSpeeds = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
     if (!window.instrumentReverses) window.instrumentReverses = { Bassline: false, "Main Arp": false, Drums: false, Drums2: false };
     if (!window.instrumentRooms) window.instrumentRooms = { Bassline: 0.5, "Main Arp": 0.5, Drums: 0.5, Drums2: 0.5 };
 
-    let proc_text_replaced = proc_text // This replaces all the current volume of the instruments and fills in with the slider data 
+    let proc_text_replaced = proc_text
         .replaceAll('<basslineVolume>', window.instrumentVolumes.Bassline)
         .replaceAll('<mainArpVolume>', window.instrumentVolumes["Main Arp"])
         .replaceAll('<drumsVolume>', window.instrumentVolumes.Drums)
@@ -53,28 +50,21 @@ export function Proc() {
 }
 window.Proc = Proc;
 
-
 export default function StrudelDemo() {
     const [darkMode, setDarkMode] = useState(false);
     const [editorReady, setEditorReady] = useState(false);
-    const [showSoundEditor, setShowSoundEditor] = useState(false); // This were from previous commits 
+    const [showSoundEditor, setShowSoundEditor] = useState(false);
+    const [analyser, setAnalyser] = useState(null);
 
     useEffect(() => {
-        const canvas = document.getElementById('roll');
-        canvas.width *= 2;
-        canvas.height *= 2;
-        const drawContext = canvas.getContext('2d');
-        const drawTime = [-2, 2];
-
         globalEditor = new StrudelMirror({
             defaultOutput: webaudioOutput,
             getTime: () => getAudioContext().currentTime,
             transpiler,
             root: document.getElementById('editor'),
             drawTime: [-2, 2],
-            onDraw: (haps, time) => drawPianoroll({ haps, time, ctx: drawContext, drawTime, fold: 0 }),
             prebake: async () => {
-                initAudioOnFirstClick();
+                await initAudioOnFirstClick();
                 const loadModules = evalScope(
                     import('@strudel/core'),
                     import('@strudel/draw'),
@@ -88,11 +78,27 @@ export default function StrudelDemo() {
 
         if (globalEditor?.root) {
             globalEditor.root.style.fontSize = '16px';
-            globalEditor.root.style.overflowY = 'auto'; // scrollable Strudel editor
+            globalEditor.root.style.overflowY = 'auto';
         }
         document.getElementById('proc').value = stranger_tune;
 
-        
+        // Setup AudioContext and AnalyserNode for waveform visualization
+        const audioCtx = getAudioContext();
+        const analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 2048;
+
+        // Connect AnalyserNode between Strudel's output and destination if possible
+        // If unavailable, connect directly to destination
+        // This may require adjustment based on your Strudel output wiring
+        try {
+            audioCtx.destination.disconnect();
+            audioCtx.destination.connect(analyserNode);
+            analyserNode.connect(audioCtx.destination);
+        } catch { }
+
+        setAnalyser(analyserNode);
+
+        // Load saved settings or set defaults
         const savedSettings = localStorage.getItem('soundSettings');
         if (savedSettings) {
             const parsed = JSON.parse(savedSettings);
@@ -100,51 +106,49 @@ export default function StrudelDemo() {
                 Bassline: parsed.Bassline?.volume ?? 1,
                 "Main Arp": parsed["Main Arp"]?.volume ?? 1,
                 Drums: parsed.Drums?.volume ?? 1,
-                Drums2: parsed.Drums2?.volume ?? 1, // This reads the saved settings or values of volume so that the sound editor doesnt reset itself every time 
+                Drums2: parsed.Drums2?.volume ?? 1,
             };
             window.instrumentEchoes = {
                 Bassline: parsed.Bassline?.echo ? 1 : 0,
                 "Main Arp": parsed["Main Arp"]?.echo ? 1 : 0,
                 Drums: parsed.Drums?.echo ? 1 : 0,
                 Drums2: parsed.Drums2?.echo ? 1 : 0,
-
             };
             window.instrumentSpeeds = {
                 Bassline: parsed.Bassline?.speed ?? 1,
                 "Main Arp": parsed["Main Arp"]?.speed ?? 1,
                 Drums: parsed.Drums?.speed ?? 1,
-                Drums2: parsed.Drums2?.speed ?? 1
+                Drums2: parsed.Drums2?.speed ?? 1,
             };
             window.instrumentReverses = {
                 Bassline: parsed.Bassline?.reverse ?? false,
                 "Main Arp": parsed["Main Arp"]?.reverse ?? false,
                 Drums: parsed.Drums?.reverse ?? false,
-                Drums2: parsed.Drums2?.reverse ?? false
+                Drums2: parsed.Drums2?.reverse ?? false,
             };
             window.instrumentRooms = {
                 Bassline: parsed.Bassline?.room ?? 0.5,
                 "Main Arp": parsed["Main Arp"]?.room ?? 0.5,
                 Drums: parsed.Drums?.room ?? 0.5,
-                Drums2: parsed.Drums2?.room ?? 0.5
+                Drums2: parsed.Drums2?.room ?? 0.5,
             };
         } else {
-            window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 }; /* this checks if the volume were altered before if not it will alter  */
-            window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 }; 
+            window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
+            window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
             window.instrumentSpeeds = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
             window.instrumentReverses = { Bassline: false, "Main Arp": false, Drums: false, Drums2: false };
             window.instrumentRooms = { Bassline: 0.5, "Main Arp": 0.5, Drums: 0.5, Drums2: 0.5 };
         }
 
-        Proc(); 
+        Proc();
         setEditorReady(true);
     }, []);
 
     const handleEditClick = () => setShowSoundEditor(true);
     const handleCancelSound = () => setShowSoundEditor(false);
     const handleRestoreSettings = () => {
-        localStorage.removeItem('soundSettings');  // erase saved settings
+        localStorage.removeItem('soundSettings');
 
-        // Reset global state objects
         window.instrumentVolumes = {
             Bassline: 1,
             "Main Arp": 1,
@@ -161,35 +165,30 @@ export default function StrudelDemo() {
             Bassline: 1,
             "Main Arp": 1,
             Drums: 1,
-            Drums2: 1
+            Drums2: 1,
         };
         window.instrumentReverses = {
             Bassline: false,
             "Main Arp": false,
             Drums: false,
-            Drums2: false
+            Drums2: false,
         };
         window.instrumentRooms = {
             Bassline: 0.5,
             "Main Arp": 0.5,
             Drums: 0.5,
-            Drums2: 0.5
+            Drums2: 0.5,
         };
 
-        // If SoundEditor is open, reset its state by forcing a re-render or passing prop
         setShowSoundEditor(false);
-
-        // Reset the text area to original tune text to clear out overrides
         document.getElementById('proc').value = stranger_tune;
-
-        // Update the editor and playback with original settings
         Proc();
-
         setShowSoundEditor(false);
     };
-    return ( /* This UI, i have imposed gray, black and white tone. */
-        <div className={darkMode ? 'night' : 'day'} >
-            <div className="header-bar" >
+
+    return (
+        <div className={darkMode ? 'night' : 'day'}>
+            <div className="header-bar">
                 <h2>Strudel Demo</h2>
                 <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
             </div>
@@ -203,7 +202,8 @@ export default function StrudelDemo() {
 
                     <div id="editor" className="curved-box"></div>
 
-                    <canvas id="roll" style={{ height: '150px', borderRadius: '10px', backgroundColor: '#222' }}></canvas>
+                    {/* Replace canvas with D3 Audio waveform component */}
+                    {analyser && <AudioWaveform analyser={analyser} />}
                 </div>
 
                 <div className="right-side">
@@ -216,31 +216,27 @@ export default function StrudelDemo() {
                             <div className="d-flex gap-3 justify-content-center align-items-center" style={{ flexWrap: 'wrap', marginBottom: '20px' }}>
                                 {editorReady && <div className="btn btn-success"><PlayPauseButton getEditor={() => globalEditor} /></div>}
                                 <div className="btn btn-danger" title="Restore" onClick={handleRestoreSettings} style={{ cursor: 'pointer' }}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white"
-                                        className="bi bi-dash-circle-fill" viewBox="0 0 16 16">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white" className="bi bi-dash-circle-fill" viewBox="0 0 16 16">
                                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z" />
                                     </svg>
                                 </div>
                                 <div className="btn btn-warning" onClick={handleEditClick} title="Edit">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white"
-                                        className="bi bi-pencil" viewBox="0 0 16 16">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white" className="bi bi-pencil" viewBox="0 0 16 16">
                                         <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
                                     </svg>
                                 </div>
-                                </div>
+                            </div>
 
-                                <InstrumentVolumeTable procFunc={Proc} />
+                            <InstrumentVolumeTable procFunc={Proc} />
+
                             <div className="export-container">
-                                    <ExportButton />
-                                    
-                                <ImportButton /> 
-                                </div> 
-                                
+                                <ExportButton />
+                                <ImportButton />
+                            </div>
                         </div>
                     )}
                 </div>
             </div>
         </div>
-           
     );
 }
