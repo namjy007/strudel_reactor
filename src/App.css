@@ -65,10 +65,13 @@ body {
 }
 
 .export-container {
-    margin-top: auto; 
+    margin-top: auto;
     display: flex;
-    justify-content: center; 
-    padding-bottom: 20px; 
+    justify-content: center; /* center horizontally */
+    gap: 20px; /* space between buttons */
+    padding-bottom: 20px;
+    width: 100%; /* full width to center properly */
+    box-sizing: border-box;
 }
 
 

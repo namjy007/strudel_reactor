@@ -13,6 +13,7 @@ import DarkModeToggle from './components/DayNight';
 import SoundEditor from './components/SoundEditor';
 import ExportButton from './components/ExportButton';
 import ImportButton from './components/ImportButton';
+import InstrumentVolumeTable from './components/InstrumentVolumeTable';
 let globalEditor = null;
 
 
@@ -140,7 +141,52 @@ export default function StrudelDemo() {
 
     const handleEditClick = () => setShowSoundEditor(true);
     const handleCancelSound = () => setShowSoundEditor(false);
+    const handleRestoreSettings = () => {
+        localStorage.removeItem('soundSettings');  // erase saved settings
 
+        // Reset global state objects
+        window.instrumentVolumes = {
+            Bassline: 1,
+            "Main Arp": 1,
+            Drums: 1,
+            Drums2: 1,
+        };
+        window.instrumentEchoes = {
+            Bassline: 0,
+            "Main Arp": 0,
+            Drums: 0,
+            Drums2: 0,
+        };
+        window.instrumentSpeeds = {
+            Bassline: 1,
+            "Main Arp": 1,
+            Drums: 1,
+            Drums2: 1
+        };
+        window.instrumentReverses = {
+            Bassline: false,
+            "Main Arp": false,
+            Drums: false,
+            Drums2: false
+        };
+        window.instrumentRooms = {
+            Bassline: 0.5,
+            "Main Arp": 0.5,
+            Drums: 0.5,
+            Drums2: 0.5
+        };
+
+        // If SoundEditor is open, reset its state by forcing a re-render or passing prop
+        setShowSoundEditor(false);
+
+        // Reset the text area to original tune text to clear out overrides
+        document.getElementById('proc').value = stranger_tune;
+
+        // Update the editor and playback with original settings
+        Proc();
+
+        setShowSoundEditor(false);
+    };
     return ( /* This UI, i have imposed gray, black and white tone. */
         <div className={darkMode ? 'night' : 'day'} >
             <div className="header-bar" >
@@ -169,7 +215,7 @@ export default function StrudelDemo() {
 
                             <div className="d-flex gap-3 justify-content-center align-items-center" style={{ flexWrap: 'wrap', marginBottom: '20px' }}>
                                 {editorReady && <div className="btn btn-success"><PlayPauseButton getEditor={() => globalEditor} /></div>}
-                                <div className="btn btn-danger" title="Restore">
+                                <div className="btn btn-danger" title="Restore" onClick={handleRestoreSettings} style={{ cursor: 'pointer' }}>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white"
                                         className="bi bi-dash-circle-fill" viewBox="0 0 16 16">
                                         <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1z" />
@@ -181,13 +227,15 @@ export default function StrudelDemo() {
                                         <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
                                     </svg>
                                 </div>
-                            </div>
-                                /* here these buttons are imported from their respectvie components */
+                                </div>
+
+                                <InstrumentVolumeTable procFunc={Proc} />
                             <div className="export-container">
                                     <ExportButton />
                                     
                                 <ImportButton /> 
                                 </div> 
+                                
                         </div>
                     )}
                 </div>
