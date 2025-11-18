@@ -31,6 +31,9 @@ export function Proc() {
     if (!window.instrumentVolumes) window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
     if (!window.instrumentEchoes)
         window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
+    if (!window.instrumentSpeeds) window.instrumentSpeeds = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
+    if (!window.instrumentReverses) window.instrumentReverses = { Bassline: false, "Main Arp": false, Drums: false, Drums2: false };
+    if (!window.instrumentRooms) window.instrumentRooms = { Bassline: 0.5, "Main Arp": 0.5, Drums: 0.5, Drums2: 0.5 };
 
     let proc_text_replaced = proc_text // This replaces all the current volume of the instruments and fills in with the slider data 
         .replaceAll('<basslineVolume>', window.instrumentVolumes.Bassline)
@@ -103,10 +106,32 @@ export default function StrudelDemo() {
                 "Main Arp": parsed["Main Arp"]?.echo ? 1 : 0,
                 Drums: parsed.Drums?.echo ? 1 : 0,
                 Drums2: parsed.Drums2?.echo ? 1 : 0,
+
+            };
+            window.instrumentSpeeds = {
+                Bassline: parsed.Bassline?.speed ?? 1,
+                "Main Arp": parsed["Main Arp"]?.speed ?? 1,
+                Drums: parsed.Drums?.speed ?? 1,
+                Drums2: parsed.Drums2?.speed ?? 1
+            };
+            window.instrumentReverses = {
+                Bassline: parsed.Bassline?.reverse ?? false,
+                "Main Arp": parsed["Main Arp"]?.reverse ?? false,
+                Drums: parsed.Drums?.reverse ?? false,
+                Drums2: parsed.Drums2?.reverse ?? false
+            };
+            window.instrumentRooms = {
+                Bassline: parsed.Bassline?.room ?? 0.5,
+                "Main Arp": parsed["Main Arp"]?.room ?? 0.5,
+                Drums: parsed.Drums?.room ?? 0.5,
+                Drums2: parsed.Drums2?.room ?? 0.5
             };
         } else {
             window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 }; /* this checks if the volume were altered before if not it will alter  */
             window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 }; 
+            window.instrumentSpeeds = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
+            window.instrumentReverses = { Bassline: false, "Main Arp": false, Drums: false, Drums2: false };
+            window.instrumentRooms = { Bassline: 0.5, "Main Arp": 0.5, Drums: 0.5, Drums2: 0.5 };
         }
 
         Proc(); 

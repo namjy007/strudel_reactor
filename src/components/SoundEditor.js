@@ -39,12 +39,7 @@ settings even when they refresh the page.  */
     useEffect(() => { 
         const saved = localStorage.getItem('soundSettings'); // This will get the previous settings 
         const instruments = ["Bassline", "Main Arp", "Drums", "Drums2"];
-        let initialSettings = {
-            Bassline: { echo: false, room: 0.5, reverse: false, volume: 1, speed: 1 },
-            "Main Arp": { echo: false, room: 0.5, reverse: false, volume: 1, speed: 1 },
-            Drums: { echo: false, room: 0.5, reverse: false, volume: 1, speed: 1 },
-            Drums2: { echo: false, room: 0.5, reverse: false, volume: 1, speed: 1 },
-        };
+        let initialSettings = { ...defaultSettings };
         let parsed = null;
         if (saved) {
             parsed = JSON.parse(saved);
@@ -61,10 +56,16 @@ settings even when they refresh the page.  */
         // Initialize global objects for Strudle
         if (!window.instrumentVolumes) window.instrumentVolumes = {};
         if (!window.instrumentEchoes) window.instrumentEchoes = {};
+        if (!window.instrumentSpeeds) window.instrumentSpeeds = {};
+        if (!window.instrumentReverses) window.instrumentReverses = {};
+        if (!window.instrumentRooms) window.instrumentRooms = {};
 
         instruments.forEach(inst => {
             window.instrumentVolumes[inst] = initialSettings[inst].volume;
             window.instrumentEchoes[inst] = initialSettings[inst].echo ? 1 : 0;
+            window.instrumentSpeeds[inst] = initialSettings[inst].speed;
+            window.instrumentReverses[inst] = initialSettings[inst].reverse;
+            window.instrumentRooms[inst] = initialSettings[inst].room;
         });
     }, []);
 
@@ -86,8 +87,15 @@ settings even when they refresh the page.  */
             
             if (!window.instrumentVolumes) window.instrumentVolumes = {};
             if (!window.instrumentEchoes) window.instrumentEchoes = {};
+            if (!window.instrumentSpeeds) window.instrumentSpeeds = {};
+            if (!window.instrumentReverses) window.instrumentReverses = {};
+            if (!window.instrumentRooms) window.instrumentRooms = {};
+
             if (key === "volume") window.instrumentVolumes[currentName] = value;
             if (key === "echo") window.instrumentEchoes[currentName] = value ? 1 : 0;
+            if (key === "speed") window.instrumentSpeeds[currentName] = value;
+            if (key === "reverse") window.instrumentReverses[currentName] = value;
+            if (key === "room") window.instrumentRooms[currentName] = value;
 
             
             if (procFunc) procFunc();

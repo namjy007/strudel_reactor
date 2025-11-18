@@ -20,6 +20,22 @@ const mainArpEcho  = window.instrumentEchoes?.["Main Arp"] ?? 0;
 const drumsEcho    = window.instrumentEchoes?.Drums ?? 0;
 const drums2Echo   = window.instrumentEchoes?.Drums2 ?? 0;
 
+const basslineReverse = window.instrumentReverses?.Bassline ?? false;
+const mainArpReverse = window.instrumentReverses?.["Main Arp"] ?? false;
+const drumsReverse = window.instrumentReverses?.Drums ?? false;
+const drums2Reverse = window.instrumentReverses?.Drums2 ?? false;
+
+
+const basslineRoom = window.instrumentRooms?.Bassline ?? 0.5;
+const mainArpRoom = window.instrumentRooms?.["Main Arp"] ?? 0.5;
+const drumsRoom = window.instrumentRooms?.Drums ?? 0.5;
+const drums2Room = window.instrumentRooms?.Drums2 ?? 0.5;
+
+const basslineSpeed = window.instrumentSpeeds?.Bassline ?? 1;
+const mainArpSpeed = window.instrumentSpeeds?.["Main Arp"] ?? 1;
+const drumsSpeed = window.instrumentSpeeds?.Drums ?? 1;
+const drums2Speed = window.instrumentSpeeds?.Drums2 ?? 1;
+
 const gain_patterns = [
   "2",
   "{0.75 2.5}*4",
@@ -57,59 +73,75 @@ const bass = 0
 bassline:
 note(pick(basslines, bass))
 .sound("supersaw")
-.postgain(basslineVolume)      // I have changed the postgain to all of the volumes. postgain acts as volume increaser or decreaser in strudel. 
-.room(0.6)
+.postgain(basslineVolume)
+.room(basslineRoom)
 .lpf(700)
-.room(0.4)
+.room(basslineRoom)
 .delay(basslineEcho)
+.speed(basslineSpeed)
+.jux(basslineReverse ? rev : id)
 
-main_arp: 
+main_arp:
 note(pick(arpeggiator1, "<0 1 2 3>/2"))
 .sound("supersaw")
 .lpf(300)
 .adsr("0:0:.5:.1")
-.room(0.6)
+.room(mainArpRoom)
 .lpenv(3.3)
-.postgain(mainArpVolume)      
+.postgain(mainArpVolume)
 .delay(mainArpEcho)
+.speed(mainArpSpeed)
+.jux(mainArpReverse ? rev : id)
 
 drums:
 stack(
   s("tech:5")
-  .postgain(drumsVolume * 6) 
+  .postgain(drumsVolume * 6)
   .pcurve(2)
   .pdec(1)
   .struct(pick(drum_structure, pattern))
-  .delay(drumsEcho),
+  .delay(drumsEcho)
+  .speed(drumsSpeed)
+  .room(drumsRoom)
+  .jux(drumsReverse ? rev : id),
 
   s("sh").struct("[x!3 ~!2 x!10 ~]")
   .postgain(drumsVolume * 0.5)
   .lpf(7000)
   .bank("RolandTR808")
-  .speed(0.8).jux(rev).room(sine.range(0.1,0.4)).gain(drumsVolume * 0.6)
+  .speed(0.8)
+  .speed(drumsSpeed)
+  .jux(drumsReverse ? rev : id)
+  .room(sine.range(0.1,0.4))
+  .gain(drumsVolume * 0.6)
   .delay(drumsEcho),
 
   s("{~ ~ rim ~ cp ~ rim cp ~!2 rim ~ cp ~ < rim ~ >!2}%8 *2")
-  .bank("[KorgDDM110, OberheimDmx]").speed(1.2)
+  .bank("[KorgDDM110, OberheimDmx]")
+  .speed(1.2)
   .postgain(drumsVolume * 0.25)
   .delay(drumsEcho)
+  .speed(drumsSpeed)
+  .room(drumsRoom)
+  .jux(drumsReverse ? rev : id)
 )
 
-drums2: 
+drums2:
 stack(
-  s("[~ hh]*4").bank("RolandTR808").room(0.3).speed(0.75).gain(drums2Volume * 1.2).delay(drums2Echo),
+  s("[~ hh]*4").bank("RolandTR808").room(drums2Room).speed(0.75 * drums2Speed).gain(drums2Volume * 1.2).delay(drums2Echo).jux(drums2Reverse ? rev : id),
   s("hh").struct("x*16").bank("RolandTR808")
   .gain(drums2Volume * 0.6)
-  .jux(rev)
+  .jux(drums2Reverse ? rev : id)
   .room(sine.range(0.1,0.4))
   .postgain(drums2Volume * 0.5)
-  .delay(drums2Echo),
-  
+  .delay(drums2Echo)
+  .speed(drums2Speed),
+
   s("[psr:[2|5|6|7|8|9|12|24|25]*16]?0.1")
   .gain(drums2Volume * 0.1)
   .postgain(pick(gain_patterns, pattern))
   .hpf(1000)
-  .speed(0.5)
+  .speed(0.5 * drums2Speed)
   .rarely(jux(rev))
   .delay(drums2Echo),
 )
