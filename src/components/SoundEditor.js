@@ -38,51 +38,68 @@ settings even when they refresh the page.  */
 
     useEffect(() => { 
         const saved = localStorage.getItem('soundSettings'); // This will get the previous settings 
+        const instruments = ["Bassline", "Main Arp", "Drums", "Drums2"];
+        let initialSettings = {
+            Bassline: { echo: false, room: 0.5, reverse: false, volume: 1, speed: 1 },
+            "Main Arp": { echo: false, room: 0.5, reverse: false, volume: 1, speed: 1 },
+            Drums: { echo: false, room: 0.5, reverse: false, volume: 1, speed: 1 },
+            Drums2: { echo: false, room: 0.5, reverse: false, volume: 1, speed: 1 },
+        };
+        let parsed = null;
         if (saved) {
-            const parsed = JSON.parse(saved);
-            setSettings(parsed);
-            /* Here i am creating a Volume global object so other app can access too*/
-            window.instrumentVolumes = {
-                Bassline: parsed.Bassline?.volume ?? 1,
-                "Main Arp": parsed["Main Arp"]?.volume ?? 1,
-                Drums: parsed.Drums?.volume ?? 1,
-                Drums2: parsed.Drums2?.volume ?? 1,
-            };
-        } else { // This sets a default value if no settings is avalaible 
-            window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
+            parsed = JSON.parse(saved);
+            // merge saved settings with dfealts
+            instruments.forEach(inst => {
+                if (parsed[inst]) {
+                    initialSettings[inst] = { ...initialSettings[inst], ...parsed[inst] };
+                }
+            });
         }
+
+        setSettings(initialSettings);
+
+        // Initialize global objects for Strudle
+        if (!window.instrumentVolumes) window.instrumentVolumes = {};
+        if (!window.instrumentEchoes) window.instrumentEchoes = {};
+
+        instruments.forEach(inst => {
+            window.instrumentVolumes[inst] = initialSettings[inst].volume;
+            window.instrumentEchoes[inst] = initialSettings[inst].echo ? 1 : 0;
+        });
     }, []);
 
     const currentName = instruments[currentInstrument];
     const currentSettings = settings[currentName];
-    const handleToggleSetting = (key) => {
-        setSettings(prev => ({
-            ...prev,
-            [currentName]: {
-                ...prev[currentName],
-                [key]: typeof prev[currentName][key] === 'boolean' ? !prev[currentName][key] : prev[currentName][key],
-            }
-        }));
-    };
-
     const handleChangeSetting = (key, value) => {
         setSettings(prev => {
-            const newSettings = { ...prev, [currentName]: { ...prev[currentName], [key]: value } };
+            const newSettings = {
+                ...prev,
+                [currentName]: {
+                    ...prev[currentName],
+                    [key]: value
+                }
+            };
 
-            // This will right after save to the local settings which will be handy 
+            
             localStorage.setItem('soundSettings', JSON.stringify(newSettings));
 
-            // For now since the only working feature is Volume.
-            if (key === "volume") {
-                if (!window.instrumentVolumes) window.instrumentVolumes = {};
-                window.instrumentVolumes[currentName] = value;
+            
+            if (!window.instrumentVolumes) window.instrumentVolumes = {};
+            if (!window.instrumentEchoes) window.instrumentEchoes = {};
+            if (key === "volume") window.instrumentVolumes[currentName] = value;
+            if (key === "echo") window.instrumentEchoes[currentName] = value ? 1 : 0;
 
-                if (procFunc) procFunc();
-            }
+            
+            if (procFunc) procFunc();
 
             return newSettings;
         });
     };
+
+    const handleToggleSetting = (key) => {
+        handleChangeSetting(key, !currentSettings[key]);
+    };
+
 
     const toggleAccordion = (key) => {
         setExpanded(prev => ({ ...prev, [key]: !prev[key] }));

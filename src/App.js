@@ -29,13 +29,18 @@ export function Proc() {
 
     /* Here the volumes are set before hand, i did work on echoes too but havent completely implemented it so far.  */
     if (!window.instrumentVolumes) window.instrumentVolumes = { Bassline: 1, "Main Arp": 1, Drums: 1, Drums2: 1 };
-    if (!window.instrumentEchoes) window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
+    if (!window.instrumentEchoes)
+        window.instrumentEchoes = { Bassline: 0, "Main Arp": 0, Drums: 0, Drums2: 0 };
 
     let proc_text_replaced = proc_text // This replaces all the current volume of the instruments and fills in with the slider data 
         .replaceAll('<basslineVolume>', window.instrumentVolumes.Bassline)
         .replaceAll('<mainArpVolume>', window.instrumentVolumes["Main Arp"])
         .replaceAll('<drumsVolume>', window.instrumentVolumes.Drums)
-        .replaceAll('<drums2Volume>', window.instrumentVolumes.Drums2);
+        .replaceAll('<drums2Volume>', window.instrumentVolumes.Drums2)
+        .replaceAll('<basslineEcho>', window.instrumentEchoes.Bassline)
+        .replaceAll('<mainArpEcho>', window.instrumentEchoes["Main Arp"])
+        .replaceAll('<drumsEcho>', window.instrumentEchoes.Drums)
+        .replaceAll('<drums2Echo>', window.instrumentEchoes.Drums2);
 
     if (globalEditor) {
         globalEditor.setCode(proc_text_replaced);
